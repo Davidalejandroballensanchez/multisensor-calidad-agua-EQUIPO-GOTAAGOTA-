@@ -1,0 +1,1 @@
+Este proyecto fue desarrollado en colaboración con *Jania De La Peña* y *Ramiro Cárdenas* como parte de la asignatura _Introducción a la Ingeniería Electrónica_ en la *Universidad Industrial de Santander (UIS)*.
