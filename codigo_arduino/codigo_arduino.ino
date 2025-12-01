@@ -1,29 +1,18 @@
-// SISTEMA DE MONITOREO EN TIEMPO REAL DE LA DISPONIBILIDAD, CALIDAD Y POTABILIDAD DEL AGUA
-//  INTEGRANTES: 
+// SISTEMA DE MONITOREO EN TIEMPO REAL DE LA CALIDAD DEL AGUA
+//                INTEGRANTES: 
 //    David Alejandro Ballen Sánchez – 2254053
 //    Ramiro Andrés Cárdenas Velásquez – 2254059
 //    Jania Kathalina De La Peña Roqueme – 2254057
 //
-//    REFERENCIA INTERNET:
-//        Todas las páginas de internet que les sirvieron de referencia
-//
-//    DESCRIPCION:
-//  Este proyecto es un sistema inteligente de monitoreo en tiempo real que analiza cuatro parámetros críticos de calidad del agua usando Arduino UNO: 
-//  nivel de agua (sensor ultrasónico HC-SR04), sólidos disueltos totales/TDS (conductividad del agua en PPM), turbidez (claridad del agua en NTU), 
-//  y pH (acidez/alcalinidad). El dispositivo cuenta con una pantalla LCD I2C 16x2 que rota entre los diferentes parámetros cada 3 segundos, 
-//  y un sistema de alertas visuales con 6 LEDs: 3 LEDs individuales para nivel de agua (verde/amarillo/rojo), un LED verde que indica alta concentración de minerales (>150 PPM),
-//  un LED RGB morado que alerta sobre agua turbia (>5 NTU), y un LED RGB naranja que advierte cuando el pH está fuera del rango seguro para consumo humano (6.5-8.5).
-//  El objetivo principal es democratizar el acceso a tecnología de análisis de agua, permitiendo a hogares, escuelas e industrias verificar la calidad del agua sin 
-//  necesidad de equipos costosos de laboratorio. 
-//  El proyecto es completamente open-source, utiliza componentes económicos y accesibles, y puede alimentarse mediante USB o batería de 9V para operación portátil. 
-//  Es ideal para aplicaciones educativas, 
-//  monitoreo de tanques de almacenamiento, verificación de sistemas de purificación, control de piscinas, y cualquier situación donde sea necesario validar que el agua cumpla
-//  con estándares básicos de calidad y seguridad.
-
+//             REFERENCIAs INTERNET:
+//      - https://docs-arduino-cc.translate.goog/libraries/liquidcrystal/?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc&_x_tr_hist=true
+//      - https://www.taloselectronics.com/blogs/tutoriales/como-usar-modulo-ph-4502-con-arduino
+//      - https://how2electronics.com/tds-sensor-arduino-interfacing-water-quality-monitoring/
+//      - https://fgcoca.github.io/Sensores-actuadores-y-shield-tipo-Arduino/turbidez/
 
 // ====================================
 // MEDIDOR COMPLETO DE CALIDAD DE AGUA
-// HC-SR04 + TDS + TURBIDEZ + pH
+// HC-SR04 + TDS + TURBIDEZ + pH 
 // LCD I2C 16x2 + LEDs + 2 LED RGB + 1 LED normal
 // ✅ VERSIÓN FINAL v3.2 - OPTIMIZADO
 // ====================================
