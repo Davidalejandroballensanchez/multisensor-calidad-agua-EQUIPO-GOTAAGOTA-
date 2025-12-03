@@ -4,8 +4,8 @@
 //    Ramiro Andrés Cárdenas Velásquez – 2254059
 //    Jania Kathalina De La Peña Roqueme – 2254057
 //
-//             REFERENCIAs INTERNET:
-//      - https://docs-arduino-cc.translate.goog/libraries/liquidcrystal/?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc&_x_tr_hist=true
+//             REFERENCIAS INTERNET:
+//      - https://docs-arduino-cc.translate.goog/libraries/liquidcrystal/
 //      - https://www.taloselectronics.com/blogs/tutoriales/como-usar-modulo-ph-4502-con-arduino
 //      - https://how2electronics.com/tds-sensor-arduino-interfacing-water-quality-monitoring/
 //      - https://fgcoca.github.io/Sensores-actuadores-y-shield-tipo-Arduino/turbidez/
@@ -14,9 +14,8 @@
 // MEDIDOR COMPLETO DE CALIDAD DE AGUA
 // HC-SR04 + TDS + TURBIDEZ + pH 
 // LCD I2C 16x2 + LEDs + 2 LED RGB + 1 LED normal
-// ✅ VERSIÓN FINAL v3.2 - OPTIMIZADO
+// ✅ VERSIÓN FINAL v3.3 - CALIBRADO
 // ====================================
-
 
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -31,25 +30,25 @@ const int pinEcho = 12;
 // Pines sensores de calidad
 const int pinTDS = A3;        // Sensor TDS
 const int pinTurbidez = A1;   // Sensor de Turbidez
-const int pinPH = A2;         // Sensor de pH ✅ NUEVO
+const int pinPH = A2;         // Sensor de pH
 
 // Pines de los LEDs (sensor ultrasónico)
 const int ledVerde = 6;
 const int ledAmarillo = 9;
 const int ledRojo = 10;
 
-// Pin del LED Verde simple (sensor TDS) - CAMBIADO A LED NORMAL ✅
-const int ledVerdeTDS = 3;  // Solo 1 pin, LED verde normal
+// Pin del LED Verde simple (sensor TDS)
+const int ledVerdeTDS = 3;
 
 // Pines del LED RGB #2 (sensor Turbidez) - Color #e900ff
 const int ledRGB2_R = 7;
 const int ledRGB2_G = 8;
 const int ledRGB2_B = 2;
 
-// Pines del LED RGB #3 (sensor pH) - Color #FFAA00 ✅ NUEVO
-const int ledRGB3_R = 4;   // Pin 4 (liberado) ✅
-const int ledRGB3_G = 5;   // Pin 5 (liberado) ✅
-const int ledRGB3_B = 11;  // Pin 11 (PWM)
+// Pines del LED RGB #3 (sensor pH) - Color #FF1E00
+const int ledRGB3_R = 4;
+const int ledRGB3_G = 5;
+const int ledRGB3_B = 11;
 
 // Variables para medición de nivel
 long duracion = 0;
@@ -68,7 +67,7 @@ int valorTurbidez = 0;
 float voltajeTurbidez = 0;
 float ntuTurbidez = 0;
 
-// Variables para sensor de pH ✅ NUEVO
+// Variables para sensor de pH
 int valorPH = 0;
 float voltajePH = 0;
 float pH = 7.0;
@@ -81,12 +80,12 @@ const int distanciaLleno = 20;
 // Límites para encender LEDs RGB
 const float limiteTDS_minimo = 150.0;      // 150 PPM (TDS)
 const float limiteTurbidez_minimo = 5.0;   // 5 NTU (Turbidez)
-const float limitePH_minimo = 6.5;         // pH mínimo seguro ✅ NUEVO
-const float limitePH_maximo = 8.5;         // pH máximo seguro ✅ NUEVO
+const float limitePH_minimo = 6.5;         // pH mínimo seguro
+const float limitePH_maximo = 8.5;         // pH máximo seguro
 
-// Variable para alternar pantallas en LCD (ahora 4 pantallas)
+// Variable para alternar pantallas en LCD (4 pantallas)
 unsigned long tiempoAnterior = 0;
-int pantallaActual = 0;  // 0 = Nivel, 1 = TDS, 2 = Turbidez, 3 = pH ✅
+int pantallaActual = 0;  // 0 = Nivel, 1 = TDS, 2 = Turbidez, 3 = pH
 
 void setup() {
   Serial.begin(9600);
@@ -101,7 +100,7 @@ void setup() {
   pinMode(ledAmarillo, OUTPUT);
   pinMode(ledRojo, OUTPUT);
   
-  // Configurar LED Verde simple (TDS) ✅
+  // Configurar LED Verde simple (TDS)
   pinMode(ledVerdeTDS, OUTPUT);
   
   // Configurar LED RGB #2 (Turbidez)
@@ -109,7 +108,7 @@ void setup() {
   pinMode(ledRGB2_G, OUTPUT);
   pinMode(ledRGB2_B, OUTPUT);
   
-  // Configurar LED RGB #3 (pH) ✅ NUEVO
+  // Configurar LED RGB #3 (pH)
   pinMode(ledRGB3_R, OUTPUT);
   pinMode(ledRGB3_G, OUTPUT);
   pinMode(ledRGB3_B, OUTPUT);
@@ -119,31 +118,31 @@ void setup() {
   pinMode(pinEcho, INPUT);
   pinMode(pinTDS, INPUT);
   pinMode(pinTurbidez, INPUT);
-  pinMode(pinPH, INPUT);  // ✅ NUEVO
+  pinMode(pinPH, INPUT);
   
   // Apagar todos los LEDs
   digitalWrite(ledVerde, LOW);
   digitalWrite(ledAmarillo, LOW);
   digitalWrite(ledRojo, LOW);
-  digitalWrite(ledVerdeTDS, LOW);  // LED simple TDS ✅
+  digitalWrite(ledVerdeTDS, LOW);
   apagarLedRGB2();
-  apagarLedRGB3();  // ✅ NUEVO
+  apagarLedRGB3();
   
   // Mensaje de inicio
   lcd.setCursor(0, 0);
   lcd.print("SISTEMA AGUA");
   lcd.setCursor(0, 1);
-  lcd.print("4 SENSORES v3.0");
+  lcd.print("4 SENSORES v3.3");
   
   Serial.println("====================================");
   Serial.println("  MEDIDOR COMPLETO DE AGUA");
   Serial.println("  Nivel + TDS + Turbidez + pH");
-  Serial.println("  ✅ VERSIÓN FINAL v3.0");
+  Serial.println("  VERSIÓN FINAL v3.3 - CALIBRADO");
   Serial.println("====================================");
   Serial.println();
   Serial.print("LED Verde (TDS): > ");
   Serial.print(limiteTDS_minimo, 0);
-  Serial.println(" PPM (LED simple)");
+  Serial.println(" PPM");
   Serial.print("LED RGB #2 (Turbidez): > ");
   Serial.print(limiteTurbidez_minimo, 0);
   Serial.println(" NTU");
@@ -178,7 +177,7 @@ void setup() {
   delay(700);
   digitalWrite(ledVerde, LOW);
   
-  // Test LED Verde simple (TDS) ✅
+  // Test LED Verde simple (TDS)
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Test LED TDS");
@@ -200,7 +199,7 @@ void setup() {
   delay(2000);
   apagarLedRGB2();
   
-  // Test LED RGB #3 (pH) ✅ NUEVO
+  // Test LED RGB #3 (pH)
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Test RGB #3");
@@ -244,12 +243,12 @@ void loop() {
   // Sensor de Turbidez
   leerSensorTurbidez();
   
-  // Sensor de pH ✅ NUEVO
+  // Sensor de pH
   leerSensorPH();
   
   // ===== ALTERNAR PANTALLAS EN LCD (4 pantallas) =====
   if (millis() - tiempoAnterior >= 3000) {
-    pantallaActual = (pantallaActual + 1) % 4;  // Ahora son 4 pantallas
+    pantallaActual = (pantallaActual + 1) % 4;
     tiempoAnterior = millis();
   }
   
@@ -261,7 +260,7 @@ void loop() {
   } else if (pantallaActual == 2) {
     mostrarTurbidezEnLCD();
   } else {
-    mostrarPHEnLCD();  // ✅ NUEVO
+    mostrarPHEnLCD();
   }
   
   // Mostrar en Monitor Serial
@@ -269,9 +268,9 @@ void loop() {
   
   // Controlar LEDs
   controlarLEDs();
-  controlarLedVerdeTDS();  // LED simple TDS ✅
-  controlarLedRGB2();      // Turbidez
-  controlarLedRGB3();      // pH ✅ NUEVO
+  controlarLedVerdeTDS();
+  controlarLedRGB2();
+  controlarLedRGB3();
   
   delay(1000);
 }
@@ -342,7 +341,7 @@ void leerSensorTurbidez() {
   }
 }
 
-// ✅ NUEVA - Función para leer sensor de pH
+// ✅ Función CALIBRADA para leer sensor de pH
 void leerSensorPH() {
   // Leer valor analógico (promedio de 10 lecturas)
   valorPH = 0;
@@ -355,16 +354,19 @@ void leerSensorPH() {
   // Convertir a voltaje (0-1023 = 0-5V)
   voltajePH = valorPH * (5.0 / 1024.0);
   
-  // Convertir voltaje a pH
-  // Fórmula de calibración estándar para sensores de pH analógicos
-  // IMPORTANTE: Estos valores pueden necesitar calibración según tu sensor
-  // pH = 7 cuando voltaje = 2.5V (punto neutro)
-  // Cada 0.18V representa aproximadamente 1 unidad de pH
+  // ✅ FÓRMULA CALIBRADA ESPECÍFICA PARA ESTE SENSOR
+  // Calibración basada en mediciones reales:
+  //   - Solución pH 4.0 → 4.463V
+  //   - Agua llave pH 7.5 → 3.257V
+  // Con ajuste proporcional del offset del sensor
   
-  // Calibración básica:
-  // Voltaje 2.5V = pH 7 (neutro)
-  // Pendiente: -5.7 (aproximado, puede variar por sensor)
-  pH = 7.0 - ((voltajePH - 2.5) / 0.18);
+  if (voltajePH < 0.1) {
+    // Sensor desconectado
+    pH = 0.0;
+  } else {
+    // Fórmula calibrada: pH = -2.90 * voltaje + 16.94
+    pH = -2.90 * voltajePH + 16.94;
+  }
   
   // Limitar valores de pH al rango válido (0-14)
   if (pH < 0) pH = 0;
@@ -459,7 +461,7 @@ void mostrarTurbidezEnLCD() {
   }
 }
 
-// ✅ NUEVA - Función para mostrar pH en LCD
+// Función para mostrar pH en LCD
 void mostrarPHEnLCD() {
   lcd.clear();
   
@@ -512,11 +514,11 @@ void mostrarEnSerial() {
   
   Serial.print("Estado nivel:  ");
   if (porcentaje >= 70) {
-    Serial.println("ALTO ✓ (LED Verde)");
+    Serial.println("ALTO (LED Verde)");
   } else if (porcentaje >= 30) {
-    Serial.println("MEDIO ⚠ (LED Amarillo)");
+    Serial.println("MEDIO (LED Amarillo)");
   } else {
-    Serial.println("BAJO ⚠⚠ (LED Rojo)");
+    Serial.println("BAJO (LED Rojo)");
   }
   
   Serial.println();
@@ -541,7 +543,7 @@ void mostrarEnSerial() {
     Serial.print(ppmTDS, 1);
     Serial.println(" PPM) - LED Verde apagado");
   } else {
-    Serial.print("⚠ AGUA MINERALIZADA - ");
+    Serial.print("AGUA MINERALIZADA - ");
     Serial.print(ppmTDS, 1);
     Serial.println(" PPM (LED Verde ENCENDIDO)");
   }
@@ -568,14 +570,14 @@ void mostrarEnSerial() {
     Serial.print(ntuTurbidez, 1);
     Serial.println(" NTU) - LED RGB #2 apagado");
   } else {
-    Serial.print("⚠ AGUA TURBIA - ");
+    Serial.print("AGUA TURBIA - ");
     Serial.print(ntuTurbidez, 1);
     Serial.println(" NTU (LED RGB #2 ENCENDIDO)");
   }
   
   Serial.println();
   
-  // ✅ NUEVA - Información pH
+  // Información pH
   Serial.print("pH valor:      ");
   Serial.print(valorPH);
   Serial.print(" (crudo 0-1023)");
@@ -591,14 +593,14 @@ void mostrarEnSerial() {
   
   Serial.print("Estado pH:     ");
   if (pH >= limitePH_minimo && pH <= limitePH_maximo) {
-    Serial.print("✓ pH SEGURO (");
+    Serial.print("pH SEGURO (");
     Serial.print(pH, 1);
     Serial.println(") - LED RGB #3 apagado");
   } else {
-    Serial.print("⚠ pH FUERA DE RANGO - ");
+    Serial.print("pH FUERA DE RANGO - ");
     Serial.print(pH, 1);
     if (pH < limitePH_minimo) {
-      Serial.println(" (ÁCIDO) - LED RGB #3 ENCENDIDO");
+      Serial.println(" (ACIDO) - LED RGB #3 ENCENDIDO");
     } else {
       Serial.println(" (ALCALINO) - LED RGB #3 ENCENDIDO");
     }
@@ -626,31 +628,30 @@ void controlarLEDs() {
   }
 }
 
-// ✅ NUEVA - Función para controlar LED Verde simple (TDS - >150 PPM)
+// Función para controlar LED Verde simple (TDS)
 void controlarLedVerdeTDS() {
   if (ppmTDS >= limiteTDS_minimo) {
-    digitalWrite(ledVerdeTDS, HIGH);  // Encender LED verde
+    digitalWrite(ledVerdeTDS, HIGH);
   } else {
-    digitalWrite(ledVerdeTDS, LOW);   // Apagar LED verde
+    digitalWrite(ledVerdeTDS, LOW);
   }
 }
 
-// Función para controlar LED RGB #2 (Turbidez - >5 NTU)
+// Función para controlar LED RGB #2 (Turbidez)
 void controlarLedRGB2() {
   if (ntuTurbidez >= limiteTurbidez_minimo) {
-    setColorRGB2(233, 0, 255);  // #e900ff
+    setColorRGB2(233, 0, 255);
   } else {
     apagarLedRGB2();
   }
 }
 
-// ✅ NUEVA - Función para controlar LED RGB #3 (pH fuera de 6.5-8.5)
+// Función para controlar LED RGB #3 (pH)
 void controlarLedRGB3() {
-  // El LED se enciende cuando el pH está FUERA del rango seguro
   if (pH < limitePH_minimo || pH > limitePH_maximo) {
-    setColorRGB3(255, 30, 0);  // #FF1E00 (naranja)
+    setColorRGB3(255, 30, 0);
   } else {
-    apagarLedRGB3();  // Apagado = pH seguro
+    apagarLedRGB3();
   }
 }
 
@@ -667,7 +668,7 @@ void apagarLedRGB2() {
   analogWrite(ledRGB2_B, 0);
 }
 
-// ✅ NUEVAS - Funciones para LED RGB #3 (pH)
+// Funciones para LED RGB #3 (pH)
 void setColorRGB3(int rojo, int verde, int azul) {
   analogWrite(ledRGB3_R, rojo);
   analogWrite(ledRGB3_G, verde);
@@ -676,6 +677,6 @@ void setColorRGB3(int rojo, int verde, int azul) {
 
 void apagarLedRGB3() {
   analogWrite(ledRGB3_R, 0);
-  digitalWrite(ledRGB3_G, LOW);
-  digitalWrite(ledRGB3_B, LOW);
+  analogWrite(ledRGB3_G, 0);
+  analogWrite(ledRGB3_B, 0);
 }
