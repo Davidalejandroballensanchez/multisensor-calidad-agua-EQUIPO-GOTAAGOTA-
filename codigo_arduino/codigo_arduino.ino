@@ -11,6 +11,7 @@
 //      - https://fgcoca.github.io/Sensores-actuadores-y-shield-tipo-Arduino/turbidez/
 
 // ====================================
+// VERSION FINAL
 // MEDIDOR COMPLETO DE CALIDAD DE AGUA
 // HC-SR04 + TDS + TURBIDEZ + pH 
 // LCD I2C 16x2 + LEDs + 2 LED RGB + 1 LED normal
@@ -78,7 +79,7 @@ const int distanciaVacio = 50;
 const int distanciaLleno = 20;
 
 // Límites para encender LEDs RGB
-const float limiteTDS_minimo = 150.0;      // 150 PPM (TDS)
+const float limiteTDS_minimo = 500.0;      // 150 PPM (TDS)
 const float limiteTurbidez_minimo = 5.0;   // 5 NTU (Turbidez)
 const float limitePH_minimo = 6.5;         // pH mínimo seguro
 const float limitePH_maximo = 8.5;         // pH máximo seguro
